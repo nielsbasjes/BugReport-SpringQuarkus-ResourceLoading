@@ -26,7 +26,6 @@ public final class ContentProvider {
     }
 
     public static String getContent(String resourcePattern) {
-
         StringBuilder content = new StringBuilder();
 
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
@@ -36,13 +35,18 @@ public final class ContentProvider {
 
             LOG.info("Found {} entr(y/ies)", resourceArray.length);
             for (Resource resource : resourceArray) {
+                LOG.info("-  {}", resource.toString());
+            }
+
+            LOG.info("Trying to load them");
+            for (Resource resource : resourceArray) {
                 LOG.info("Loading entry: {}", resource.toString());
-                content.append(read(resource.getInputStream())).append('\n');
+                content.append(read(resource.getInputStream())).append(' ');
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return content.toString();
+        return content.toString().trim();
     }
 
     private static String read(InputStream inputStream) throws IOException {
@@ -52,11 +56,12 @@ public final class ContentProvider {
             (inputStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
             int c;
             while ((c = reader.read()) != -1) {
-                textBuilder.append((char) c);
+                if (c != '\n') {
+                    textBuilder.append((char) c);
+                }
             }
         }
         return textBuilder.toString();
     }
-
 
 }
